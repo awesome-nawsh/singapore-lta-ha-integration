@@ -1,0 +1,80 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to LTA DataMall",
+        "description": "Enter the AccountKey from your LTA DataMall account (register at https://datamall.lta.gov.sg/). It is stored only in this integration entry and used only to call LTA's APIs.",
+        "data": { "account_key": "AccountKey" }
+      }
+    },
+    "error": {
+      "invalid_auth": "The AccountKey was rejected by LTA DataMall.",
+      "cannot_connect": "Could not reach LTA DataMall. Check your internet connection and try again."
+    },
+    "abort": {
+      "already_configured": "This LTA DataMall AccountKey is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "LTA DataMall trackers",
+        "menu_options": {
+          "add_bus_stop": "Add a bus stop",
+          "add_carpark": "Add a carpark",
+          "add_ev_postal": "Add an EV charging location (by postal code)",
+          "add_bicycle_parking": "Add a bicycle parking point",
+          "add_crowd_line": "Add a train line (station crowd density)",
+          "add_camera": "Add a traffic camera",
+          "remove_tracker": "Remove a tracker"
+        }
+      },
+      "add_bus_stop": {
+        "title": "Add a bus stop",
+        "description": "5-digit bus stop code, e.g. {example}. Leave the service number blank to track every service at this stop.",
+        "data": { "bus_stop_code": "Bus stop code", "service_no": "Service number (optional)" }
+      },
+      "add_carpark": {
+        "title": "Add a carpark",
+        "description": "CarParkID as published by LTA/URA/HDB, e.g. {example}.",
+        "data": { "carpark_id": "Carpark ID" }
+      },
+      "add_ev_postal": {
+        "title": "Add an EV charging location",
+        "description": "6-digit Singapore postal code, e.g. {example}.",
+        "data": { "postal_code": "Postal code" }
+      },
+      "add_bicycle_parking": {
+        "title": "Add a bicycle parking point",
+        "description": "Bicycle parking racks within a radius of this point will be tracked.",
+        "data": {
+          "name": "Name",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "radius_km": "Radius (km)"
+        }
+      },
+      "add_crowd_line": {
+        "title": "Add a train line",
+        "description": "A sensor will be created for every station on this line automatically.",
+        "data": { "train_line": "Train line" }
+      },
+      "add_camera": {
+        "title": "Add a traffic camera",
+        "description": "CameraID, e.g. {example}. See Annex G of the LTA DataMall API guide for a location list.",
+        "data": { "camera_id": "Camera ID" }
+      },
+      "remove_tracker": {
+        "title": "Remove a tracker",
+        "data": { "tracker": "Tracker to remove" }
+      }
+    },
+    "error": {
+      "invalid_bus_stop_code": "Bus stop codes are 5 digits.",
+      "invalid_postal_code": "Postal codes are 6 digits."
+    },
+    "abort": {
+      "no_trackers": "There are no trackers configured to remove."
+    }
+  }
+}

@@ -1,0 +1,109 @@
+get_bus_services:
+  name: Get bus services
+  description: >-
+    Look up service info (operator, category, first/last stop, dispatch
+    frequency) for one or all bus services. Reference data, updated ad hoc.
+  fields:
+    service_no:
+      name: Service number
+      description: Optional. Limit to a single bus service number.
+      example: "15"
+      selector:
+        text:
+
+get_bus_routes:
+  name: Get bus routes
+  description: >-
+    Look up every bus stop, in order, along every bus service's route.
+    Reference data, updated ad hoc.
+
+get_bus_stops:
+  name: Get bus stops
+  description: Look up bus stop code, road name and coordinates for one or all bus stops.
+  fields:
+    bus_stop_code:
+      name: Bus stop code
+      description: Optional. Limit to a single 5-digit bus stop code.
+      example: "01012"
+      selector:
+        text:
+
+get_taxi_stands:
+  name: Get taxi stands
+  description: Look up taxi stand locations. Reference data, updated monthly.
+
+get_planned_bus_routes:
+  name: Get planned bus routes
+  description: Look up planned new/updated bus routes not yet in effect.
+
+get_traffic_flow:
+  name: Get traffic flow
+  description: >-
+    Look up hourly average traffic volume by road category. Reference data,
+    updated quarterly.
+
+get_geospatial_layer:
+  name: Get geospatial layer
+  description: >-
+    Get a 5-minute download link for a Geospatial Whole Island SHP layer.
+    See Annex E of the LTA DataMall API guide for valid layer IDs.
+  fields:
+    layer_id:
+      name: Layer ID
+      description: Case-sensitive geospatial layer name, e.g. ArrowMarking.
+      example: ArrowMarking
+      required: true
+      selector:
+        text:
+
+get_ev_charging_points_batch:
+  name: Get all EV charging points
+  description: >-
+    Look up every EV charging point in Singapore and its availability in one
+    call (instead of tracking individual postal codes).
+
+get_passenger_volume_bus:
+  name: Get passenger volume by bus stops
+  description: >-
+    Get a 5-minute download link (CSV in a zip) for tap in/out passenger
+    volume by bus stop.
+  fields:
+    date:
+      name: Date
+      description: Optional. Format YYYYMM, up to 3 months back. Defaults to the latest available.
+      example: "202506"
+      selector:
+        text:
+
+get_passenger_volume_od_bus:
+  name: Get passenger volume by origin-destination bus stops
+  description: Get a 5-minute download link for trip counts between bus stops.
+  fields:
+    date:
+      name: Date
+      description: Optional. Format YYYYMM, up to 3 months back. Defaults to the latest available.
+      example: "202506"
+      selector:
+        text:
+
+get_passenger_volume_od_train:
+  name: Get passenger volume by origin-destination train stations
+  description: Get a 5-minute download link for trip counts between train stations.
+  fields:
+    date:
+      name: Date
+      description: Optional. Format YYYYMM, up to 3 months back. Defaults to the latest available.
+      example: "202506"
+      selector:
+        text:
+
+get_passenger_volume_train:
+  name: Get passenger volume by train stations
+  description: Get a 5-minute download link for tap in/out passenger volume by train station.
+  fields:
+    date:
+      name: Date
+      description: Optional. Format YYYYMM, up to 3 months back. Defaults to the latest available.
+      example: "202506"
+      selector:
+        text:
