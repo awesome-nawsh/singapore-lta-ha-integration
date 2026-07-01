@@ -30,11 +30,16 @@ from .const import (
     DOMAIN,
     EP_CARPARK_AVAILABILITY,
     EP_TRAFFIC_IMAGES,
+    GROUP_BICYCLE,
+    GROUP_BUS,
+    GROUP_CARPARKS,
     GROUP_ENVIRONMENT,
+    GROUP_EV,
     GROUP_RAIL,
     GROUP_ROADS,
     GROUP_TAXIS,
     PLATFORMS,
+    TRACKER_CATEGORY,
     TRACKER_BICYCLE_PARKING,
     TRACKER_BUS_STOP,
     TRACKER_CAMERA,
@@ -98,16 +103,32 @@ def _register_devices_and_migrate(hass: HomeAssistant, entry: ConfigEntry) -> No
     ent_reg = er.async_get(hass)
 
     # The top-level hub, which serves as the via_device parent for the themed
-    # groups and per-tracker devices.
+    # groups and per-tracker category devices.
     dev_reg.async_get_or_create(config_entry_id=entry.entry_id, **hub_device_info(entry))
 
     group_device_ids: dict[tuple[str, str], str] = {}
-    for group in (GROUP_ROADS, GROUP_RAIL, GROUP_TAXIS, GROUP_ENVIRONMENT):
-        device = dev_reg.async_get_or_create(
-            config_entry_id=entry.entry_id, **group_device_info(entry, *group)
-        )
-        group_device_ids[group] = device.id
 
+    def _ensure_group(group: tuple[str, str]) -> str:
+        if group not in group_device_ids:
+            device = dev_reg.async_get_or_create(
+                config_entry_id=entry.entry_id, **group_device_info(entry, *group)
+            )
+            group_device_ids[group] = device.id
+        return group_device_ids[group]
+
+    # Global-entity groups are always present.
+    for group in (GROUP_ROADS, GROUP_RAIL, GROUP_TAXIS, GROUP_ENVIRONMENT):
+        _ensure_group(group)
+
+    # Tracker category groups (Bus, Carparks, ...) only for tracker types that
+    # are actually configured, so empty category devices don't clutter the UI.
+    for tracker in entry.options.get("trackers", []):
+        category = TRACKER_CATEGORY.get(tracker.get(CONF_TRACKER_TYPE))
+        if category is not None:
+            _ensure_group(category)
+
+    # Move any pre-existing global entities onto their group device (changing
+    # device_info alone does not re-home an already-registered entity).
     for reg_entry in er.async_entries_for_config_entry(ent_reg, entry.entry_id):
         group = _group_for_unique_id(entry.entry_id, reg_entry.unique_id)
         if group is None:
@@ -115,6 +136,29 @@ def _register_devices_and_migrate(hass: HomeAssistant, entry: ConfigEntry) -> No
         target_device_id = group_device_ids[group]
         if reg_entry.device_id != target_device_id:
             ent_reg.async_update_entity(reg_entry.entity_id, device_id=target_device_id)
+
+    # Re-parent any pre-existing tracker devices under their category device.
+    entry_prefix = f"{entry.entry_id}_"
+    tracker_prefix_groups = {
+        "bus_stop_": GROUP_BUS,
+        "carpark_": GROUP_CARPARKS,
+        "ev_": GROUP_EV,
+        "bicycle_": GROUP_BICYCLE,
+        "crowd_": GROUP_RAIL,
+        "camera_": GROUP_ROADS,
+    }
+    for device in dr.async_entries_for_config_entry(dev_reg, entry.entry_id):
+        ident = next((i[1] for i in device.identifiers if i[0] == DOMAIN), None)
+        if not ident or not ident.startswith(entry_prefix):
+            continue
+        key = ident[len(entry_prefix):]
+        for prefix, group in tracker_prefix_groups.items():
+            if not key.startswith(prefix):
+                continue
+            target_device_id = group_device_ids.get(group)
+            if target_device_id and device.via_device_id != target_device_id:
+                dev_reg.async_update_device(device.id, via_device_id=target_device_id)
+            break
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

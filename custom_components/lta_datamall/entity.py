@@ -37,13 +37,19 @@ def group_device_info(entry: ConfigEntry, group_key: str, name: str) -> DeviceIn
     )
 
 
-def tracker_device_info(entry: ConfigEntry, tracker_key: str, name: str) -> DeviceInfo:
-    """Device for a single user-added tracker (a bus stop, a carpark, ...)."""
+def tracker_device_info(
+    entry: ConfigEntry, tracker_key: str, name: str, parent_group_key: str
+) -> DeviceInfo:
+    """Device for a single user-added tracker (a bus stop, a carpark, ...).
+
+    Nests under its themed category device (``parent_group_key``, e.g. "bus")
+    rather than directly under the hub, so trackers group by type.
+    """
     return DeviceInfo(
         identifiers={(DOMAIN, f"{entry.entry_id}_{tracker_key}")},
         name=name,
         manufacturer=MANUFACTURER,
-        via_device=(DOMAIN, entry.entry_id),
+        via_device=(DOMAIN, f"{entry.entry_id}_group_{parent_group_key}"),
     )
 
 

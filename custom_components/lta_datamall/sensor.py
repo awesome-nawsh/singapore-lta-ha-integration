@@ -39,6 +39,10 @@ from .const import (
     EP_TRAFFIC_INCIDENTS,
     EP_TRAFFIC_SPEED_BANDS,
     EP_VMS,
+    GROUP_BICYCLE,
+    GROUP_BUS,
+    GROUP_CARPARKS,
+    GROUP_EV,
     GROUP_RAIL,
     GROUP_ROADS,
     GROUP_TAXIS,
@@ -274,7 +278,9 @@ class CarparkSensor(LTABaseEntity, SensorEntity):
 
     def __init__(self, coordinator: LTACoordinator, entry: ConfigEntry, config: dict) -> None:
         carpark_id = config[CONF_CARPARK_ID]
-        device = tracker_device_info(entry, f"carpark_{carpark_id}", f"Carpark {carpark_id}")
+        device = tracker_device_info(
+            entry, f"carpark_{carpark_id}", f"Carpark {carpark_id}", GROUP_CARPARKS[0]
+        )
         super().__init__(coordinator, f"{entry.entry_id}_carpark_{carpark_id}", device)
         self._carpark_id = carpark_id
         self._attr_name = "Available Lots"
@@ -310,7 +316,9 @@ class EvChargingSensor(LTABaseEntity, SensorEntity):
 
     def __init__(self, coordinator: LTACoordinator, entry: ConfigEntry, config: dict) -> None:
         postal = config[CONF_POSTAL_CODE]
-        device = tracker_device_info(entry, f"ev_{postal}", f"EV Charging - {postal}")
+        device = tracker_device_info(
+            entry, f"ev_{postal}", f"EV Charging - {postal}", GROUP_EV[0]
+        )
         super().__init__(coordinator, f"{entry.entry_id}_ev_{postal}", device)
         self._attr_name = "Available Connectors"
 
@@ -353,7 +361,9 @@ class BicycleParkingSensor(LTABaseEntity, SensorEntity):
 
     def __init__(self, coordinator: LTACoordinator, entry: ConfigEntry, config: dict) -> None:
         name = config[CONF_NAME]
-        device = tracker_device_info(entry, f"bicycle_{name}", f"Bicycle Parking - {name}")
+        device = tracker_device_info(
+            entry, f"bicycle_{name}", f"Bicycle Parking - {name}", GROUP_BICYCLE[0]
+        )
         super().__init__(coordinator, f"{entry.entry_id}_bicycle_{name}", device)
         self._attr_name = "Racks Found"
 
@@ -400,7 +410,10 @@ class BusArrivalManager:
         self._async_add_entities = async_add_entities
         self._known_services: set[str] = set()
         self._device = tracker_device_info(
-            entry, f"bus_stop_{config[CONF_BUS_STOP_CODE]}", f"Bus Stop {config[CONF_BUS_STOP_CODE]}"
+            entry,
+            f"bus_stop_{config[CONF_BUS_STOP_CODE]}",
+            f"Bus Stop {config[CONF_BUS_STOP_CODE]}",
+            GROUP_BUS[0],
         )
         coordinator.async_add_listener(self._handle_update)
         self._handle_update()
@@ -502,7 +515,9 @@ class CrowdLineManager:
         self._async_add_entities = async_add_entities
         self._known_stations: set[str] = set()
         line = config[CONF_TRAIN_LINE]
-        self._device = tracker_device_info(entry, f"crowd_{line}", f"Station Crowd Density - {line} Line")
+        self._device = tracker_device_info(
+            entry, f"crowd_{line}", f"Station Crowd Density - {line} Line", GROUP_RAIL[0]
+        )
         coordinator.async_add_listener(self._handle_update)
         self._handle_update()
 

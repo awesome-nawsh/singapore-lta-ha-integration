@@ -16,7 +16,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CONF_CAMERA_ID, CONF_TRACKER_TYPE, DOMAIN, TRACKER_CAMERA
+from .const import CONF_CAMERA_ID, CONF_TRACKER_TYPE, DOMAIN, GROUP_ROADS, TRACKER_CAMERA
 from .coordinator import LTACoordinator
 from .entity import LTABaseEntity, tracker_device_info
 
@@ -44,7 +44,9 @@ class TrafficCameraEntity(LTABaseEntity, Camera):
     def __init__(self, coordinator: LTACoordinator, entry: ConfigEntry, config: dict) -> None:
         Camera.__init__(self)
         camera_id = config[CONF_CAMERA_ID]
-        device = tracker_device_info(entry, f"camera_{camera_id}", f"Traffic Camera {camera_id}")
+        device = tracker_device_info(
+            entry, f"camera_{camera_id}", f"Traffic Camera {camera_id}", GROUP_ROADS[0]
+        )
         LTABaseEntity.__init__(self, coordinator, f"{entry.entry_id}_camera_{camera_id}", device)
         self._camera_id = camera_id
 

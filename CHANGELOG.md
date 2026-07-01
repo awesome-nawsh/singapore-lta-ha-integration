@@ -8,6 +8,18 @@ follow the `manifest.json` `version` field.
 
 Nothing yet.
 
+## [0.1.3] - 2026-07-02
+
+### Added
+
+- Per-tracker devices now nest under a themed category device by type, so
+  they group in the tree instead of hanging individually off the hub: **Bus**
+  (bus-stop trackers), **Carparks**, **EV Charging**, and **Bicycle Parking**,
+  with Station Crowd trackers folded into **Rail / MRT** and Traffic Camera
+  trackers into **Roads & Traffic**. Category devices appear only for tracker
+  types that are actually configured. Existing tracker devices are re-parented
+  on upgrade.
+
 ## [0.1.2] - 2026-07-02
 
 ### Fixed

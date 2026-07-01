@@ -159,13 +159,30 @@ CROWD_TRAIN_LINES = [
 
 CROWD_LEVEL_MAP = {"l": "low", "m": "moderate", "h": "high", "NA": "unknown"}
 
-# Themed sub-devices the always-on global entities are grouped under, so the
-# ~19 island-wide entities appear as a tidy tree rather than one flat list.
+# Themed sub-devices entities are grouped under, so the island-wide entities
+# and the per-tracker devices appear as a tidy tree rather than one flat list.
 # Each value is (group_key, display_name); the key feeds the device identifier.
+# Roads/Rail/Taxis/Environment hold the always-on global entities; Bus/Carparks/
+# EV/Bicycle are parents that the corresponding tracker devices nest under
+# (Station Crowd trackers reuse Rail, Traffic Camera trackers reuse Roads).
 GROUP_ROADS = ("roads", "Roads & Traffic")
 GROUP_RAIL = ("rail", "Rail / MRT")
 GROUP_TAXIS = ("taxis", "Taxis")
 GROUP_ENVIRONMENT = ("environment", "Environment & Safety")
+GROUP_BUS = ("bus", "Bus")
+GROUP_CARPARKS = ("carparks", "Carparks")
+GROUP_EV = ("ev", "EV Charging")
+GROUP_BICYCLE = ("bicycle", "Bicycle Parking")
+
+# Which category device each tracker type nests under (via_device parent).
+TRACKER_CATEGORY: dict[str, tuple[str, str]] = {
+    TRACKER_BUS_STOP: GROUP_BUS,
+    TRACKER_CARPARK: GROUP_CARPARKS,
+    TRACKER_EV_POSTAL: GROUP_EV,
+    TRACKER_BICYCLE_PARKING: GROUP_BICYCLE,
+    TRACKER_CROWD_LINE: GROUP_RAIL,
+    TRACKER_CAMERA: GROUP_ROADS,
+}
 
 # Cap on list-type extra state attributes to avoid oversized recorder rows.
 MAX_ATTR_LIST_ITEMS = 50
