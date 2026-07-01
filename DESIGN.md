@@ -11,7 +11,7 @@ these decisions were implemented.
 version, rather than starting with just bus arrivals / train disruptions /
 EV charging / carparks and adding the rest later.
 
-**Why:** Sean's explicit choice when asked - larger initial build, but no
+**Why:** the maintainer's explicit choice when asked - larger initial build, but no
 follow-up work needed to reach parity with the API guide.
 
 ## 2. Config Flow UI, not YAML
@@ -19,7 +19,7 @@ follow-up work needed to reach parity with the API guide.
 **Decision:** all configuration (AccountKey, trackers) goes through Home
 Assistant's config flow / options flow UI. No `configuration.yaml` support.
 
-**Why:** Sean's explicit choice. It's also the current HA-recommended
+**Why:** the maintainer's explicit choice. It's also the current HA-recommended
 pattern (YAML config for integrations has been discouraged by HA core for
 several years), and it's the only way to support add/remove of trackers
 without restarting Home Assistant.
@@ -31,7 +31,7 @@ and stored only in that config entry's data, in HA's own encrypted-at-rest
 storage (`.storage/core.config_entries`). It's used only by that entry's own
 `LTAApiClient` instance.
 
-**Why:** Sean asked for this explicitly, wanting the key to be scoped to
+**Why:** the maintainer asked for this explicitly, wanting the key to be scoped to
 "that integration only" rather than shared or written to a config file. This
 also means multiple config entries with different keys are possible (e.g. a
 second AccountKey for testing), each fully isolated.
@@ -48,7 +48,7 @@ ranges from 20 seconds (Bus Arrival) to quarterly (Traffic Flow), and only
 some endpoints accept a location/line filter. A single polling strategy for
 all of them would either hammer LTA's servers with endpoints that rarely
 change, or under-poll the ones that matter. This was proposed as a plan and
-explicitly approved by Sean before any code was written.
+explicitly approved by the maintainer before any code was written.
 
 A specific refinement made *during* implementation (not part of the original
 plan, but a direct consequence of reading the API guide closely): Carpark
@@ -68,7 +68,7 @@ tracker exists, shared by all trackers of that type, filtered client-side by
 that stop (`sensor.lta_bus_<stop>_<service>`, state = minutes to arrival),
 rather than a single per-stop sensor with all services as attributes.
 
-**Why:** Sean's explicit choice, asked directly during planning. A numeric
+**Why:** the maintainer's explicit choice, asked directly during planning. A numeric
 state per service is directly usable in automations and dashboard cards
 without template parsing; the trade-off (more entities) was accepted
 knowingly.
@@ -88,7 +88,7 @@ Routes, Traffic Flow, Geospatial Whole Island, the 4 Passenger Volume
 endpoints, and EV Charging Points Batch are exposed as Home Assistant
 actions (`lta_datamall.get_*`), not sensors.
 
-**Why:** Sean approved this as proposed. Two independent reasons converged:
+**Why:** the maintainer approved this as proposed. Two independent reasons converged:
 these datasets update ad hoc/monthly/quarterly (polling them as sensors
 would create mostly-static entities for no benefit), and four of them (the
 Passenger Volume endpoints, plus Geospatial Whole Island) don't return
