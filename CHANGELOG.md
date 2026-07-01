@@ -8,6 +8,18 @@ follow the `manifest.json` `version` field.
 
 Nothing yet.
 
+## [0.1.2] - 2026-07-02
+
+### Fixed
+
+- Existing global entities now actually move onto the themed sub-devices
+  introduced in 0.1.1. Changing an entity's `device_info` does not, on its
+  own, re-home an already-registered entity (HA creates the new device but
+  leaves the entity on its original one), so upgraded installs saw the four
+  themed devices created but empty while all entities stayed on the hub. Setup
+  now performs an explicit entity-registry migration; new installs and
+  already-migrated installs are unaffected.
+
 ## [0.1.1] - 2026-07-02
 
 ### Changed
