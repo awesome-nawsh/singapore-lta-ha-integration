@@ -6,7 +6,15 @@ built, move it to `CHANGELOG.md` and delete it from here.
 
 ## User-requested ideas
 
-_(Nothing logged yet - add requests here as they come up.)_
+- [ ] Bus stop tracker: create the "Bus Stop <code>" device (and maybe a
+      lightweight per-stop sensor) up front when the tracker is added, instead
+      of only materializing it once the Bus Arrival API returns at least one
+      running service. Today a stop added when no buses are in operation (e.g.
+      late night, when `Services` comes back empty) shows nothing at all, which
+      reads as broken. Creating the device eagerly would make it visible
+      immediately, with the per-service sensors still appearing dynamically as
+      services come online. (Same dynamic-materialization caveat applies to
+      Station Crowd trackers.)
 
 ## Known limitations (identified during the v0.1.0 build)
 
