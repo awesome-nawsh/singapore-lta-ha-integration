@@ -11,9 +11,17 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import ALERT_TRAIN_LINES, DOMAIN, EP_FLOOD_ALERTS, EP_TRAIN_SERVICE_ALERTS, MAX_ATTR_LIST_ITEMS
+from .const import (
+    ALERT_TRAIN_LINES,
+    DOMAIN,
+    EP_FLOOD_ALERTS,
+    EP_TRAIN_SERVICE_ALERTS,
+    GROUP_ENVIRONMENT,
+    GROUP_RAIL,
+    MAX_ATTR_LIST_ITEMS,
+)
 from .coordinator import LTACoordinator
-from .entity import LTABaseEntity, hub_device_info
+from .entity import LTABaseEntity, group_device_info
 
 
 async def async_setup_entry(
@@ -22,14 +30,15 @@ async def async_setup_entry(
     """Set up LTA DataMall binary sensors for a config entry."""
     runtime = hass.data[DOMAIN][entry.entry_id]
     global_coordinators: dict[str, LTACoordinator] = runtime["global"]
-    device = hub_device_info(entry)
+    environment_device = group_device_info(entry, *GROUP_ENVIRONMENT)
+    rail_device = group_device_info(entry, *GROUP_RAIL)
 
     entities: list[BinarySensorEntity] = [
-        FloodAlertBinarySensor(global_coordinators[EP_FLOOD_ALERTS], entry, device)
+        FloodAlertBinarySensor(global_coordinators[EP_FLOOD_ALERTS], entry, environment_device)
     ]
     train_coordinator = global_coordinators[EP_TRAIN_SERVICE_ALERTS]
     for line in ALERT_TRAIN_LINES:
-        entities.append(TrainServiceAlertBinarySensor(train_coordinator, entry, device, line))
+        entities.append(TrainServiceAlertBinarySensor(train_coordinator, entry, rail_device, line))
 
     async_add_entities(entities)
 

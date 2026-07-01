@@ -159,6 +159,14 @@ CROWD_TRAIN_LINES = [
 
 CROWD_LEVEL_MAP = {"l": "low", "m": "moderate", "h": "high", "NA": "unknown"}
 
+# Themed sub-devices the always-on global entities are grouped under, so the
+# ~19 island-wide entities appear as a tidy tree rather than one flat list.
+# Each value is (group_key, display_name); the key feeds the device identifier.
+GROUP_ROADS = ("roads", "Roads & Traffic")
+GROUP_RAIL = ("rail", "Rail / MRT")
+GROUP_TAXIS = ("taxis", "Taxis")
+GROUP_ENVIRONMENT = ("environment", "Environment & Safety")
+
 # Cap on list-type extra state attributes to avoid oversized recorder rows.
 MAX_ATTR_LIST_ITEMS = 50
 

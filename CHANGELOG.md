@@ -8,6 +8,24 @@ follow the `manifest.json` `version` field.
 
 Nothing yet.
 
+## [0.1.1] - 2026-07-02
+
+### Changed
+
+- The always-on Singapore-wide entities are now grouped into themed
+  sub-devices ("Roads & Traffic", "Rail / MRT", "Taxis", "Environment &
+  Safety") that hang off the main "LTA DataMall" hub device, instead of all
+  ~19 entities appearing as one flat list under a single device. The hub
+  device is now registered explicitly at setup so those sub-devices (and the
+  per-tracker devices) have a `via_device` parent.
+
+### Fixed
+
+- Corrected the documented minimum Home Assistant version in the README to
+  2024.6 to match `hacs.json`.
+- Pointed the manifest `documentation` / `issue_tracker` / `codeowners` at
+  the actual repository.
+
 ## [0.1.0] - 2026-07-01
 
 Initial release. Full coverage of the LTA DataMall API User Guide v6.8 (21

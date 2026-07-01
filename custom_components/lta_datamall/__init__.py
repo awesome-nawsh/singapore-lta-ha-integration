@@ -14,8 +14,10 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.helpers import device_registry as dr
 
 from .api import LTAApiClient, LTAApiError, LTAAuthError
+from .entity import hub_device_info
 from .const import (
     CONF_ACCOUNT_KEY,
     CONF_BUS_STOP_CODE,
@@ -109,6 +111,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "shared": shared_coordinators,
         "trackers": trackers,
     }
+
+    # Register the top-level hub device explicitly. No entity attaches to it
+    # directly anymore (globals hang off themed group sub-devices), so it must
+    # be created here to serve as the via_device parent for those groups and
+    # for each tracker device.
+    dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id, **hub_device_info(entry)
+    )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_update_listener))

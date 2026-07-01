@@ -21,6 +21,22 @@ def hub_device_info(entry: ConfigEntry) -> DeviceInfo:
     )
 
 
+def group_device_info(entry: ConfigEntry, group_key: str, name: str) -> DeviceInfo:
+    """Themed sub-device grouping a subset of the always-on global entities
+    (e.g. "Roads & Traffic", "Rail / MRT"). Hangs off the main hub device via
+    ``via_device`` so the entities appear in a tidy tree rather than one flat
+    list of ~19 items under a single device.
+    """
+    return DeviceInfo(
+        identifiers={(DOMAIN, f"{entry.entry_id}_group_{group_key}")},
+        name=name,
+        manufacturer=MANUFACTURER,
+        entry_type=DeviceEntryType.SERVICE,
+        configuration_url="https://datamall.lta.gov.sg/",
+        via_device=(DOMAIN, entry.entry_id),
+    )
+
+
 def tracker_device_info(entry: ConfigEntry, tracker_key: str, name: str) -> DeviceInfo:
     """Device for a single user-added tracker (a bus stop, a carpark, ...)."""
     return DeviceInfo(

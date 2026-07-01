@@ -39,6 +39,9 @@ from .const import (
     EP_TRAFFIC_INCIDENTS,
     EP_TRAFFIC_SPEED_BANDS,
     EP_VMS,
+    GROUP_RAIL,
+    GROUP_ROADS,
+    GROUP_TAXIS,
     MAX_ATTR_LIST_ITEMS,
     TRACKER_BICYCLE_PARKING,
     TRACKER_BUS_STOP,
@@ -47,7 +50,7 @@ from .const import (
     TRACKER_EV_POSTAL,
 )
 from .coordinator import LTACoordinator
-from .entity import LTABaseEntity, hub_device_info, tracker_device_info
+from .entity import LTABaseEntity, group_device_info, tracker_device_info
 
 # Speed band -> approximate midpoint km/h, per API User Guide 2.19 (8 bands,
 # 10 km/h wide, v4 TrafficSpeedBands).
@@ -71,13 +74,17 @@ async def async_setup_entry(
     # sensors as new bus services / stations show up in its data. Kept alive
     # here (not garbage collected) for the lifetime of the config entry.
     managers: list[Any] = runtime.setdefault("_sensor_managers", [])
-    device = hub_device_info(entry)
+    # Themed sub-devices so the always-on global entities group by type rather
+    # than piling up as one flat list under a single device.
+    roads_device = group_device_info(entry, *GROUP_ROADS)
+    rail_device = group_device_info(entry, *GROUP_RAIL)
+    taxis_device = group_device_info(entry, *GROUP_TAXIS)
 
     entities.append(
         LTAGlobalCountSensor(
             global_coordinators[EP_TRAFFIC_INCIDENTS],
             entry,
-            device,
+            roads_device,
             "traffic_incidents",
             "Traffic Incidents",
             attrs_fn=lambda data: {"incidents": _cap(data)},
@@ -87,7 +94,7 @@ async def async_setup_entry(
         LTAGlobalCountSensor(
             global_coordinators[EP_FAULTY_TRAFFIC_LIGHTS],
             entry,
-            device,
+            roads_device,
             "faulty_traffic_lights",
             "Faulty Traffic Lights",
             attrs_fn=lambda data: {"faults": _cap(data)},
@@ -97,7 +104,7 @@ async def async_setup_entry(
         LTAGlobalCountSensor(
             global_coordinators[EP_ROAD_OPENINGS],
             entry,
-            device,
+            roads_device,
             "planned_road_openings",
             "Planned Road Openings",
             attrs_fn=lambda data: {"road_openings": _cap(data)},
@@ -107,7 +114,7 @@ async def async_setup_entry(
         LTAGlobalCountSensor(
             global_coordinators[EP_ROAD_WORKS],
             entry,
-            device,
+            roads_device,
             "approved_road_works",
             "Approved Road Works",
             attrs_fn=lambda data: {"road_works": _cap(data)},
@@ -117,7 +124,7 @@ async def async_setup_entry(
         LTAGlobalCountSensor(
             global_coordinators[EP_VMS],
             entry,
-            device,
+            roads_device,
             "vms_messages",
             "VMS Messages",
             attrs_fn=lambda data: {"messages": _cap(data)},
@@ -127,7 +134,7 @@ async def async_setup_entry(
         LTAGlobalCountSensor(
             global_coordinators[EP_TAXI_AVAILABILITY],
             entry,
-            device,
+            taxis_device,
             "taxis_available",
             "Taxis Available",
             unit="taxis",
@@ -137,15 +144,15 @@ async def async_setup_entry(
         LTAGlobalCountSensor(
             global_coordinators[EP_FACILITIES_MAINTENANCE],
             entry,
-            device,
+            rail_device,
             "lift_maintenance",
             "MRT Lifts Under Maintenance",
             unit="lifts",
             attrs_fn=lambda data: {"lifts": _cap(data)},
         )
     )
-    entities.append(EstimatedTravelTimesSensor(global_coordinators[EP_EST_TRAVEL_TIMES], entry, device))
-    entities.append(TrafficSpeedBandSensor(global_coordinators[EP_TRAFFIC_SPEED_BANDS], entry, device))
+    entities.append(EstimatedTravelTimesSensor(global_coordinators[EP_EST_TRAVEL_TIMES], entry, roads_device))
+    entities.append(TrafficSpeedBandSensor(global_coordinators[EP_TRAFFIC_SPEED_BANDS], entry, roads_device))
 
     for tracker in trackers:
         ttype = tracker["config"][CONF_TRACKER_TYPE]
