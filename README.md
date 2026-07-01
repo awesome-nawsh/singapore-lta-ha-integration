@@ -9,7 +9,7 @@ points, bicycle parking, traffic cameras, station crowd density, and more.
 
 - A free LTA DataMall account and **AccountKey**. Register at
   https://datamall.lta.gov.sg/content/datamall/en/request-for-api.html.
-- Home Assistant 2024.1 or newer.
+- Home Assistant 2024.6 or newer.
 
 ## Installation (HACS)
 
