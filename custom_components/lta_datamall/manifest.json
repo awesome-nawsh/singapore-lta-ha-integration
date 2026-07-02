@@ -1,14 +1,14 @@
 {
   "domain": "lta_datamall",
   "name": "LTA DataMall (Singapore)",
-  "version": "0.1.4",
-  "config_flow": true,
-  "documentation": "https://github.com/awesome-nawsh/singapore-lta-ha-integration",
-  "issue_tracker": "https://github.com/awesome-nawsh/singapore-lta-ha-integration/issues",
-  "requirements": [],
-  "dependencies": [],
   "codeowners": ["@awesome-nawsh"],
-  "iot_class": "cloud_polling",
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/awesome-nawsh/singapore-lta-ha-integration",
   "integration_type": "hub",
-  "loggers": ["custom_components.lta_datamall"]
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/awesome-nawsh/singapore-lta-ha-integration/issues",
+  "loggers": ["custom_components.lta_datamall"],
+  "requirements": [],
+  "version": "0.1.4"
 }
