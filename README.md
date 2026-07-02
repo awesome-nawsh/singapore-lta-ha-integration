@@ -76,6 +76,29 @@ The master reference for every dataset is LTA's own
 [DataMall API User Guide](https://datamall.lta.gov.sg/content/datamall/en/dynamic-data.html)
 (also bundled in this repo as `LTA_DataMall_API_User_Guide.pdf`).
 
+## Dashboard
+
+Two ready-to-import Lovelace dashboards live in [`dashboards/`](./dashboards).
+Both are imported the same way: **Settings > Dashboards > (+) Add dashboard >
+"New dashboard from scratch"**, then open the new dashboard's three-dot menu >
+**Edit in YAML** (raw config editor) and paste the file's contents.
+
+- **`dashboards/lta_overview.yaml` (recommended)** - uses the
+  [`auto-entities`](https://github.com/thomasloven/lovelace-auto-entities) card
+  (install it once from HACS > Frontend > search "auto-entities"). Every section
+  discovers its entities by filtering on `integration: lta_datamall`, so it
+  hardcodes no entity IDs and populates automatically as you add trackers and as
+  bus-arrival / station-crowd sensors appear at runtime.
+- **`dashboards/lta_overview_core.yaml`** - uses only built-in Home Assistant
+  cards, no extra installs. The always-present island-wide entities are wired up
+  for you; because built-in cards can't self-discover entities, you add your
+  per-tracker entities (bus, carpark, EV, bicycle, camera, crowd) to the example
+  cards yourself.
+
+In both files, the island-wide entity IDs assume the default device/entity
+names. If a card shows "entity not found", look up the real ID in
+**Developer Tools > States** and update it - the file comments point this out.
+
 ## Reference data (actions, not entities)
 
 Bus Services, Bus Routes, Bus Stops, Taxi Stands, Planned Bus Routes,
