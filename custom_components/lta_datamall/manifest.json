@@ -10,5 +10,5 @@
   "issue_tracker": "https://github.com/awesome-nawsh/singapore-lta-ha-integration/issues",
   "loggers": ["custom_components.lta_datamall"],
   "requirements": [],
-  "version": "0.1.4"
+  "version": "0.1.5"
 }

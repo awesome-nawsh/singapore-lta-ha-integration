@@ -8,6 +8,27 @@ follow the `manifest.json` `version` field.
 
 Nothing yet.
 
+## [0.1.5] - 2026-07-02
+
+### Added
+
+- Two importable Lovelace dashboards under `dashboards/`: `lta_overview.yaml`
+  (uses the `auto-entities` card; discovers entities by `integration:
+  lta_datamall` so it adapts to configured trackers) and `lta_overview_core.yaml`
+  (built-in cards only, no custom-card dependency). Documented in `README.md`.
+- `async_remove_config_entry_device`, so a tracker device left orphaned after
+  its tracker is removed can be deleted from the device page in the UI.
+
+### Fixed
+
+- Train Service Alerts binary sensors no longer fail to load. The endpoint
+  returns `value` as a single object rather than a list, which raised
+  `KeyError: 0` inside `is_on` while the entities were being added and left all
+  nine `<Line> Line Service Alert` sensors permanently `unavailable`.
+- hassfest compliance: sorted `manifest.json` keys (domain, name, then
+  alphabetical) and removed the URL from the config-flow user description in
+  `strings.json` / `translations/en.json`.
+
 ## [0.1.4] - 2026-07-02
 
 ### Added
