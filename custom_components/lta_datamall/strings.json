@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Connect to LTA DataMall",
-        "description": "Enter the AccountKey from your LTA DataMall account (register at https://datamall.lta.gov.sg/). It is stored only in this integration entry and used only to call LTA's APIs.",
+        "description": "Enter the AccountKey from your LTA DataMall account. It is stored only in this integration entry and used only to call LTA's APIs.",
         "data": { "account_key": "AccountKey" }
       }
     },
