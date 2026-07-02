@@ -1,0 +1,188 @@
+# LTA DataMall - overview dashboard (core-only variant)
+# ---------------------------------------------------------------------------
+# This dashboard uses ONLY built-in Home Assistant cards - no custom cards to
+# install. The trade-off: built-in cards cannot self-discover entities, so the
+# always-present island-wide entities are referenced by entity_id below, and
+# dynamic/per-tracker entities (bus, crowd, carpark, EV, bicycle, camera) must
+# be added by you once you've created those trackers.
+#
+# IMPORTANT - verify the entity_ids. The island-wide entities below use one of
+# TWO prefix conventions depending on how your integration was installed:
+#   * Fresh install (current releases): prefixed with the themed device name,
+#     e.g. sensor.roads_traffic_traffic_incidents,
+#     binary_sensor.environment_safety_flood_alert  <-- what this file uses.
+#   * Upgraded/migrated install (added the integration before themed devices
+#     existed): prefixed with the hub name, e.g.
+#     sensor.lta_datamall_traffic_incidents,
+#     binary_sensor.lta_datamall_flood_alert.
+# If a card shows "entity not found", open Developer Tools > States, search for
+# the entity, and paste its real entity_id here (for a migrated install, replace
+# every "roads_traffic_"/"rail_mrt_"/"taxis_"/"environment_safety_" prefix with
+# "lta_datamall_"). Per-tracker entities (bus/EV/carpark/...) always use their
+# own tracker-device name, e.g. sensor.bus_stop_11331_service_156.
+#
+# To use: Settings > Dashboards > (+) Add dashboard > "New dashboard from
+# scratch" > three-dot menu > "Edit in YAML" > replace with everything below.
+# ---------------------------------------------------------------------------
+title: LTA DataMall (core)
+views:
+  # =========================================================================
+  - title: Overview
+    path: overview
+    icon: mdi:city-variant-outline
+    cards:
+      - type: glance
+        title: Island-wide status
+        columns: 3
+        show_state: true
+        entities:
+          - entity: sensor.roads_traffic_traffic_incidents
+            name: Incidents
+          - entity: sensor.roads_traffic_faulty_traffic_lights
+            name: Faulty lights
+          - entity: sensor.roads_traffic_vms_messages
+            name: VMS
+          - entity: sensor.taxis_taxis_available
+            name: Taxis
+          - entity: sensor.rail_mrt_mrt_lifts_under_maintenance
+            name: Lifts down
+          - entity: sensor.roads_traffic_approved_road_works
+            name: Road works
+
+      - type: gauge
+        name: Island-wide average speed
+        entity: sensor.roads_traffic_traffic_speed_island_wide_average
+        unit: km/h
+        needle: true
+        severity:
+          red: 0
+          yellow: 20
+          green: 40
+
+      - type: entities
+        title: Safety
+        state_color: true
+        entities:
+          - entity: binary_sensor.environment_safety_flood_alert
+            name: Flood alert
+
+  # =========================================================================
+  - title: Roads & Traffic
+    path: roads
+    icon: mdi:road-variant
+    cards:
+      - type: markdown
+        title: Traffic incidents
+        content: |
+          {% set items = state_attr('sensor.roads_traffic_traffic_incidents', 'incidents') %}
+          {% if items %}
+          {% for i in items %}
+          - **{{ i.Type }}** - {{ i.Message }}
+          {% endfor %}
+          {% else %}
+          No incidents reported.
+          {% endif %}
+
+      - type: markdown
+        title: Estimated travel times (expressways)
+        content: |
+          {% set xw = state_attr('sensor.roads_traffic_estimated_travel_times', 'expressways') %}
+          {% if xw %}
+          {% for name, segs in xw.items() %}
+          **{{ name }}**
+          {% for s in segs %}
+            - {{ s.direction }} {{ s.start_point }} to {{ s.end_point }}: {{ s.est_time_min }} min
+          {% endfor %}
+          {% endfor %}
+          {% else %}
+          No travel-time data.
+          {% endif %}
+
+      # One picture-entity card per traffic-camera tracker you add. Duplicate
+      # the block and set the entity to each camera (Developer Tools > States,
+      # search "camera.").
+      - type: picture-entity
+        title: Traffic camera
+        entity: camera.traffic_camera_REPLACE_ME
+        camera_view: auto
+
+  # =========================================================================
+  - title: Rail / MRT
+    path: rail
+    icon: mdi:train
+    cards:
+      - type: entities
+        title: MRT / LRT line service alerts
+        state_color: true
+        entities:
+          - entity: binary_sensor.rail_mrt_ewl_line_service_alert
+            name: East-West (EWL)
+          - entity: binary_sensor.rail_mrt_nsl_line_service_alert
+            name: North-South (NSL)
+          - entity: binary_sensor.rail_mrt_nel_line_service_alert
+            name: North-East (NEL)
+          - entity: binary_sensor.rail_mrt_ccl_line_service_alert
+            name: Circle (CCL)
+          - entity: binary_sensor.rail_mrt_dtl_line_service_alert
+            name: Downtown (DTL)
+          - entity: binary_sensor.rail_mrt_tel_line_service_alert
+            name: Thomson-East Coast (TEL)
+          - entity: binary_sensor.rail_mrt_bpl_line_service_alert
+            name: Bukit Panjang LRT (BPL)
+          - entity: binary_sensor.rail_mrt_stl_line_service_alert
+            name: Sengkang LRT (STL)
+          - entity: binary_sensor.rail_mrt_ptl_line_service_alert
+            name: Punggol LRT (PTL)
+
+      - type: entities
+        title: Lifts under maintenance
+        entities:
+          - entity: sensor.rail_mrt_mrt_lifts_under_maintenance
+            name: Lifts under maintenance
+
+      # Station crowd-density sensors are created per station on a line tracker
+      # as stations are observed. Add them here once they exist (they end in
+      # "_crowd_level"), or just open the "Station Crowd Density" device page.
+      - type: markdown
+        content: >
+          Add a **Train line** tracker to get per-station crowd levels. Once
+          created, view them on the device page (Settings > Devices & Services
+          > LTA DataMall > the "Station Crowd Density - <Line>" device), or list
+          the `..._crowd_level` sensors in an entities card here.
+
+  # =========================================================================
+  - title: Trackers
+    path: trackers
+    icon: mdi:map-marker-multiple
+    cards:
+      - type: markdown
+        content: >
+          ## Your trackers
+
+          Bus, carpark, EV, and bicycle entities appear only after you add the
+          matching tracker (Settings > Devices & Services > LTA DataMall >
+          Configure). The easiest way to see them is the auto-generated
+          **device page** for each tracker. To pin them here, add their
+          entity_ids to the example cards below (find them in Developer Tools >
+          States):
+
+          - Bus arrival: `sensor.bus_stop_<code>_service_<n>` (minutes to next bus)
+          - Carpark: `sensor.<...>_available_lots`
+          - EV charging: `sensor.<...>_available_connectors`
+          - Bicycle parking: `sensor.<...>_racks_found`
+
+      - type: entities
+        title: Buses (example - edit entities)
+        entities:
+          - entity: sensor.bus_stop_REPLACE_ME_service_REPLACE_ME
+            name: Next bus
+
+      - type: entities
+        title: Parking & EV (example - edit entities)
+        entities:
+          - entity: sensor.REPLACE_ME_available_lots
+            name: Carpark lots
+          - entity: sensor.REPLACE_ME_available_connectors
+            name: EV connectors
+          - entity: sensor.REPLACE_ME_racks_found
+            name: Bicycle racks

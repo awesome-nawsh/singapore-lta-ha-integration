@@ -1,0 +1,236 @@
+# LTA DataMall - overview dashboard (auto-entities variant)
+# ---------------------------------------------------------------------------
+# This is the RECOMMENDED dashboard. It requires the "auto-entities" custom
+# card (install it once from HACS > Frontend > search "auto-entities"). Every
+# section discovers its entities dynamically by filtering on
+# `integration: lta_datamall`, so it needs NO hardcoded entity_ids and adapts
+# automatically as you add trackers or as bus/crowd sensors appear at runtime.
+#
+# To use: Settings > Dashboards > (+) Add dashboard > "New dashboard from
+# scratch" > open the three-dot menu > "Edit in YAML" (raw config editor) >
+# replace the contents with everything below.
+# ---------------------------------------------------------------------------
+title: LTA DataMall
+views:
+  # =========================================================================
+  - title: Overview
+    path: overview
+    icon: mdi:city-variant-outline
+    cards:
+      - type: markdown
+        content: >
+          ## Singapore LTA DataMall
+
+          Live island-wide transport data. Cards below populate as trackers are
+          added (Settings > Devices & Services > LTA DataMall > Configure).
+
+      # Active alerts only - flood + any disrupted MRT/LRT line.
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: Active alerts
+          state_color: true
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: binary_sensor
+              state: "on"
+        sort:
+          method: friendly_name
+
+      # Island-wide count sensors, in one glance strip.
+      - type: custom:auto-entities
+        card:
+          type: glance
+          title: Island-wide status
+          columns: 3
+          show_state: true
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*traffic_incidents"
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*faulty_traffic_lights"
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*vms_messages"
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*taxis_available"
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*lifts_under_maintenance"
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*approved_road_works"
+
+      - type: gauge
+        name: Island-wide average speed
+        entity: sensor.roads_traffic_traffic_speed_island_wide_average
+        unit: km/h
+        needle: true
+        severity:
+          red: 0
+          yellow: 20
+          green: 40
+        # NOTE: this is the one hardcoded id in this dashboard (gauges can't be
+        # auto-filtered). If it shows "entity not found", check the real id in
+        # Developer Tools > States (filter "traffic_speed"): a migrated install
+        # uses sensor.lta_datamall_traffic_speed_island_wide_average instead.
+
+  # =========================================================================
+  - title: Roads & Traffic
+    path: roads
+    icon: mdi:road-variant
+    cards:
+      - type: markdown
+        title: Traffic incidents
+        content: |
+          {% set items = state_attr('sensor.roads_traffic_traffic_incidents', 'incidents') %}
+          {% if items %}
+          {% for i in items %}
+          - **{{ i.Type }}** - {{ i.Message }}
+          {% endfor %}
+          {% else %}
+          No incidents reported.
+          {% endif %}
+
+      - type: markdown
+        title: Estimated travel times (expressways)
+        content: |
+          {% set xw = state_attr('sensor.roads_traffic_estimated_travel_times', 'expressways') %}
+          {% if xw %}
+          {% for name, segs in xw.items() %}
+          **{{ name }}**
+          {% for s in segs %}
+            - {{ s.direction }} {{ s.start_point }} to {{ s.end_point }}: {{ s.est_time_min }} min
+          {% endfor %}
+          {% endfor %}
+          {% else %}
+          No travel-time data.
+          {% endif %}
+
+      # Traffic cameras (one per configured camera tracker).
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: Traffic cameras
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: camera
+
+  # =========================================================================
+  - title: Rail / MRT
+    path: rail
+    icon: mdi:train
+    cards:
+      # All 9 line service-alert binary sensors (on = disrupted).
+      - type: custom:auto-entities
+        card:
+          type: entities
+          title: MRT / LRT line service alerts
+          state_color: true
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: binary_sensor
+              entity_id: "binary_sensor.*service_alert"
+        sort:
+          method: friendly_name
+
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: Lifts under maintenance
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*lifts_under_maintenance"
+
+      # Station crowd-density sensors (appear as stations are observed).
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: Station crowd density
+          state_color: true
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*crowd_level"
+        sort:
+          method: friendly_name
+
+  # =========================================================================
+  - title: Buses
+    path: buses
+    icon: mdi:bus
+    cards:
+      - type: markdown
+        content: >
+          Bus-arrival sensors appear per service at each bus-stop tracker, and
+          grow as new services are seen. Value is minutes to the next bus.
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: Next bus (minutes)
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.bus_stop_*"
+        sort:
+          method: friendly_name
+
+  # =========================================================================
+  - title: Parking & EV
+    path: parking
+    icon: mdi:parking
+    cards:
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: Carpark availability (lots)
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*available_lots"
+        sort:
+          method: friendly_name
+
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: EV charging (available connectors)
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*available_connectors"
+        sort:
+          method: friendly_name
+
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: Bicycle parking (racks found)
+        filter:
+          include:
+            - integration: lta_datamall
+              domain: sensor
+              entity_id: "sensor.*racks_found"
+        sort:
+          method: friendly_name
