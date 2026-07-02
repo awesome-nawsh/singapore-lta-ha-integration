@@ -65,13 +65,21 @@ class FloodAlertBinarySensor(LTABaseEntity, BinarySensorEntity):
 def _parse_train_alerts(raw: Any) -> dict[str, dict]:
     """Normalise the Train Service Alerts response into {line: segment_info}.
 
-    Normal operation: {"value": [{"Status": 1}]} (no AffectedSegments key).
-    Disrupted: {"value": [{"Status": 2, "AffectedSegments": [{"Line": ...}, ...]}]}.
+    The Train Service Alerts endpoint returns ``value`` as a single object,
+    not a list - e.g. normal operation is {"value": {"Status": 1, ...}} and a
+    disruption is {"value": {"Status": 2, "AffectedSegments": [{"Line": ...}]}}.
+    Some OData responses do wrap single records in a one-element list though,
+    so accept both shapes to be safe.
     """
     if not isinstance(raw, dict):
         return {}
-    records = raw.get("value") or []
-    record = records[0] if records else {}
+    value = raw.get("value")
+    if isinstance(value, list):
+        record = value[0] if value else {}
+    elif isinstance(value, dict):
+        record = value
+    else:
+        record = {}
     if record.get("Status") != 2:
         return {}
     by_line: dict[str, dict] = {}

@@ -21,8 +21,11 @@ from .entity import group_device_info, hub_device_info
 from .const import (
     CONF_ACCOUNT_KEY,
     CONF_BUS_STOP_CODE,
+    CONF_CAMERA_ID,
+    CONF_CARPARK_ID,
     CONF_LATITUDE,
     CONF_LONGITUDE,
+    CONF_NAME,
     CONF_POSTAL_CODE,
     CONF_RADIUS_KM,
     CONF_TRACKER_TYPE,
@@ -247,3 +250,50 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if not hass.data[DOMAIN]:
             async_unregister_services(hass)
     return unload_ok
+
+
+def _tracker_device_key(tracker: dict) -> str | None:
+    """The per-tracker device identifier suffix for a tracker config dict.
+
+    Must match the keys the platforms pass to ``tracker_device_info`` (see
+    sensor.py/camera.py); used to tell a live tracker device from an orphan.
+    """
+    ttype = tracker.get(CONF_TRACKER_TYPE)
+    if ttype == TRACKER_BUS_STOP:
+        return f"bus_stop_{tracker[CONF_BUS_STOP_CODE]}"
+    if ttype == TRACKER_CARPARK:
+        return f"carpark_{tracker[CONF_CARPARK_ID]}"
+    if ttype == TRACKER_EV_POSTAL:
+        return f"ev_{tracker[CONF_POSTAL_CODE]}"
+    if ttype == TRACKER_BICYCLE_PARKING:
+        return f"bicycle_{tracker[CONF_NAME]}"
+    if ttype == TRACKER_CROWD_LINE:
+        return f"crowd_{tracker[CONF_TRAIN_LINE]}"
+    if ttype == TRACKER_CAMERA:
+        return f"camera_{tracker[CONF_CAMERA_ID]}"
+    return None
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, entry: ConfigEntry, device_entry: dr.DeviceEntry
+) -> bool:
+    """Allow deleting a tracker device from the UI once it is orphaned.
+
+    Removing a tracker (options flow) does not delete its device/entities from
+    the registry, so a stale device can linger showing ``unavailable``. Permit
+    deleting such an orphan, but refuse the hub, the themed group devices, and
+    any device still backed by a configured tracker (those get rebuilt on the
+    next reload anyway).
+    """
+    ident = next((i[1] for i in device_entry.identifiers if i[0] == DOMAIN), None)
+    if ident is None:
+        return False
+    # The hub and the themed group service devices are always live.
+    if ident == entry.entry_id or ident.startswith(f"{entry.entry_id}_group_"):
+        return False
+    live_ids = {
+        f"{entry.entry_id}_{key}"
+        for key in (_tracker_device_key(t) for t in entry.options.get("trackers", []))
+        if key is not None
+    }
+    return ident not in live_ids
