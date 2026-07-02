@@ -95,9 +95,15 @@ Both are imported the same way: **Settings > Dashboards > (+) Add dashboard >
   per-tracker entities (bus, carpark, EV, bicycle, camera, crowd) to the example
   cards yourself.
 
-In both files, the island-wide entity IDs assume the default device/entity
-names. If a card shows "entity not found", look up the real ID in
-**Developer Tools > States** and update it - the file comments point this out.
+In both files, the island-wide entity IDs use the themed-device prefix that a
+**fresh** install generates (e.g. `sensor.roads_traffic_traffic_incidents`). If
+you added this integration before the themed sub-devices existed, your
+island-wide entities are instead prefixed `lta_datamall_` (e.g.
+`sensor.lta_datamall_traffic_incidents`) - the `auto-entities` dashboard handles
+both automatically, but for the core dashboard you'll need to swap the prefixes.
+Either way, if a card shows "entity not found", look up the real ID in
+**Developer Tools > States** and update it - the file comments explain both
+conventions.
 
 ## Reference data (actions, not entities)
 

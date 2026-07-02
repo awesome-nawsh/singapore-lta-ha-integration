@@ -6,11 +6,20 @@
 # dynamic/per-tracker entities (bus, crowd, carpark, EV, bicycle, camera) must
 # be added by you once you've created those trackers.
 #
-# IMPORTANT - verify the entity_ids: every entity here belongs to a themed
-# "device" (Roads & Traffic, Rail / MRT, ...), so its entity_id is prefixed
-# with that device's name. The ids below are the expected slugs; if a card
-# shows "entity not found", open Developer Tools > States, search for the
-# entity, and paste its real entity_id here.
+# IMPORTANT - verify the entity_ids. The island-wide entities below use one of
+# TWO prefix conventions depending on how your integration was installed:
+#   * Fresh install (current releases): prefixed with the themed device name,
+#     e.g. sensor.roads_traffic_traffic_incidents,
+#     binary_sensor.environment_safety_flood_alert  <-- what this file uses.
+#   * Upgraded/migrated install (added the integration before themed devices
+#     existed): prefixed with the hub name, e.g.
+#     sensor.lta_datamall_traffic_incidents,
+#     binary_sensor.lta_datamall_flood_alert.
+# If a card shows "entity not found", open Developer Tools > States, search for
+# the entity, and paste its real entity_id here (for a migrated install, replace
+# every "roads_traffic_"/"rail_mrt_"/"taxis_"/"environment_safety_" prefix with
+# "lta_datamall_"). Per-tracker entities (bus/EV/carpark/...) always use their
+# own tracker-device name, e.g. sensor.bus_stop_11331_service_156.
 #
 # To use: Settings > Dashboards > (+) Add dashboard > "New dashboard from
 # scratch" > three-dot menu > "Edit in YAML" > replace with everything below.

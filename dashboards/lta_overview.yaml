@@ -76,8 +76,10 @@ views:
           red: 0
           yellow: 20
           green: 40
-        # NOTE: if this shows "entity not found", check the real entity_id in
-        # Developer Tools > States (filter "traffic_speed") and update it.
+        # NOTE: this is the one hardcoded id in this dashboard (gauges can't be
+        # auto-filtered). If it shows "entity not found", check the real id in
+        # Developer Tools > States (filter "traffic_speed"): a migrated install
+        # uses sensor.lta_datamall_traffic_speed_island_wide_average instead.
 
   # =========================================================================
   - title: Roads & Traffic
