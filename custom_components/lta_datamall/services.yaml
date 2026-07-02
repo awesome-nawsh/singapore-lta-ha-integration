@@ -62,6 +62,18 @@ get_ev_charging_points_batch:
     Look up every EV charging point in Singapore and its availability in one
     call (instead of tracking individual postal codes).
 
+get_carpark_availability:
+  name: Get carpark availability
+  description: >-
+    List every carpark (LTA/HDB/URA) with its CarParkID, development name and
+    available lots. Use this to find the CarParkID to add as a carpark tracker.
+
+get_traffic_cameras:
+  name: Get traffic cameras
+  description: >-
+    List every traffic camera with its CameraID and coordinates. Use this to
+    find the CameraID to add as a traffic-camera tracker.
+
 get_passenger_volume_bus:
   name: Get passenger volume by bus stops
   description: >-

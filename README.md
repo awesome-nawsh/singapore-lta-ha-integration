@@ -55,6 +55,27 @@ DataMall > Configure:
 Trackers can be added and removed at any time; the integration reloads
 automatically to match.
 
+### Where to find each ID / value
+
+You supply an ID, code, or coordinate when adding a tracker. Here is where
+to look each one up - several can be pulled from LTA itself using this
+integration's own actions (Developer Tools > Actions), so you don't need to
+leave Home Assistant:
+
+| Tracker input | Where to find it |
+|---|---|
+| Bus stop code (5-digit) | Printed on the physical bus-stop pole; call `lta_datamall.get_bus_stops` (returns every stop's code, road name and coordinates); or search a stop on [BusRouter SG](https://busrouter.sg/). |
+| Bus service number | Call `lta_datamall.get_bus_services` for the full list, or `lta_datamall.get_bus_routes` to see which services stop at a given code. |
+| CarParkID | Call `lta_datamall.get_carpark_availability` to list every carpark (LTA/HDB/URA) with its `CarParkID`, development name and free lots; also on the [DataMall dynamic datasets page](https://datamall.lta.gov.sg/content/datamall/en/dynamic-data.html) or [data.gov.sg](https://data.gov.sg/). |
+| EV charging postal code (6-digit) | Any Singapore 6-digit postal code. Look up an address on [OneMap](https://www.onemap.gov.sg/); or call `lta_datamall.get_ev_charging_points_batch` to list every charging point island-wide (each carries its address) and pick one. |
+| Bicycle parking latitude / longitude | Read the coordinates off [OneMap](https://www.onemap.gov.sg/) or Google Maps (right-click a spot > the lat/long is shown). The radius defaults to 0.5 km. |
+| Train line code | One of `CCL`, `CEL`, `CGL`, `DTL`, `EWL`, `NEL`, `NSL`, `BPL`, `SLRT`, `PLRT`, `TEL`. |
+| Traffic CameraID | Call `lta_datamall.get_traffic_cameras` to list every camera with its `CameraID` and coordinates; the IDs are also documented in the bundled [`LTA_DataMall_API_User_Guide.pdf`](./LTA_DataMall_API_User_Guide.pdf). |
+
+The master reference for every dataset is LTA's own
+[DataMall API User Guide](https://datamall.lta.gov.sg/content/datamall/en/dynamic-data.html)
+(also bundled in this repo as `LTA_DataMall_API_User_Guide.pdf`).
+
 ## Reference data (actions, not entities)
 
 Bus Services, Bus Routes, Bus Stops, Taxi Stands, Planned Bus Routes,
@@ -70,6 +91,11 @@ action: lta_datamall.get_bus_services
 data:
   service_no: "15"
 ```
+
+Two further actions - `get_carpark_availability` and `get_traffic_cameras` -
+expose the island-wide carpark and traffic-camera datasets on demand purely
+so you can look up a `CarParkID` or `CameraID` to add as a tracker (these
+datasets are otherwise only polled once a matching tracker exists).
 
 See `services.yaml` for the full list and fields.
 

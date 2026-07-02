@@ -132,7 +132,11 @@ speculative hardening):
   at options-flow time, not checked against LTA's actual Bus Stops list or a
   real postal code. An invalid-but-correctly-formatted code will simply
   result in an entity that's `unavailable` (empty coordinator data) rather
-  than a config-flow error.
+  than a config-flow error. To help users supply a *correct* ID up front,
+  the master lists are exposed as on-demand actions (`get_bus_stops`,
+  `get_carpark_availability`, `get_traffic_cameras`,
+  `get_ev_charging_points_batch`) rather than wired into options-flow
+  validation - discovery without the cost of a live lookup on every add.
 - **Traffic camera images are fetched live, never cached**, by design (see
   `ARCHITECTURE.md`) - this is a deliberate correctness choice given the
   5-minute link expiry, not a limitation, but it does mean a `camera_image()`

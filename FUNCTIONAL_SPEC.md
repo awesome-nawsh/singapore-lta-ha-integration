@@ -53,6 +53,25 @@ automatic reload of the integration (no restart needed).
 
 Removing a tracker removes its entities and device on the next reload.
 
+### Where the tracker inputs come from
+
+The value each tracker asks for can be looked up as follows - several
+without leaving Home Assistant, using the actions listed below:
+
+| Input | Source |
+|---|---|
+| Bus stop code | On the bus-stop pole; `lta_datamall.get_bus_stops`; or [BusRouter SG](https://busrouter.sg/) |
+| Bus service number | `lta_datamall.get_bus_services` / `lta_datamall.get_bus_routes` |
+| CarParkID | `lta_datamall.get_carpark_availability` |
+| EV charging postal code | Any SG 6-digit postal code ([OneMap](https://www.onemap.gov.sg/)); or `lta_datamall.get_ev_charging_points_batch` |
+| Bicycle parking lat/long | [OneMap](https://www.onemap.gov.sg/) or Google Maps |
+| Train line code | `CCL`, `CEL`, `CGL`, `DTL`, `EWL`, `NEL`, `NSL`, `BPL`, `SLRT`, `PLRT`, `TEL` |
+| Traffic CameraID | `lta_datamall.get_traffic_cameras`; also listed in the bundled `LTA_DataMall_API_User_Guide.pdf` |
+
+Every tracker input except the bicycle-parking coordinates and train line
+code can be enumerated from LTA via an action, without leaving Home
+Assistant; the README carries the same table with clickable links.
+
 ## Actions (Developer Tools > Actions, or from automations/scripts)
 
 Reference/bulk datasets that are not polled - each call hits LTA live and
@@ -68,6 +87,8 @@ returns its result as action response data.
 | `lta_datamall.get_traffic_flow` | Hourly average traffic volume by road category | - |
 | `lta_datamall.get_geospatial_layer` | 5-minute download link for a SHP geospatial layer | `layer_id` (required) |
 | `lta_datamall.get_ev_charging_points_batch` | Every EV charging point island-wide in one call | - |
+| `lta_datamall.get_carpark_availability` | Every carpark's CarParkID, development and free lots (find a CarParkID to track) | - |
+| `lta_datamall.get_traffic_cameras` | Every traffic camera's CameraID and coordinates (find a CameraID to track) | - |
 | `lta_datamall.get_passenger_volume_bus` | 5-minute download link: passenger volume by bus stop | `date` (YYYYMM) |
 | `lta_datamall.get_passenger_volume_od_bus` | 5-minute download link: trip counts, bus stop to bus stop | `date` (YYYYMM) |
 | `lta_datamall.get_passenger_volume_od_train` | 5-minute download link: trip counts, station to station | `date` (YYYYMM) |

@@ -8,6 +8,17 @@ follow the `manifest.json` `version` field.
 
 Nothing yet.
 
+## [0.1.4] - 2026-07-02
+
+### Added
+
+- Two on-demand actions to help discover tracker IDs without leaving Home
+  Assistant: `lta_datamall.get_carpark_availability` (lists every carpark's
+  `CarParkID`, development and free lots) and `lta_datamall.get_traffic_cameras`
+  (lists every camera's `CameraID` and coordinates).
+- A "Where to find each ID / value" reference table in `README.md` and
+  `FUNCTIONAL_SPEC.md` mapping every tracker input to where to look it up.
+
 ## [0.1.3] - 2026-07-02
 
 ### Added

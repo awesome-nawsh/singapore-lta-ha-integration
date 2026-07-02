@@ -26,6 +26,8 @@ SERVICE_GET_PLANNED_BUS_ROUTES = "get_planned_bus_routes"
 SERVICE_GET_TRAFFIC_FLOW = "get_traffic_flow"
 SERVICE_GET_GEOSPATIAL_LAYER = "get_geospatial_layer"
 SERVICE_GET_EV_CHARGING_POINTS_BATCH = "get_ev_charging_points_batch"
+SERVICE_GET_CARPARK_AVAILABILITY = "get_carpark_availability"
+SERVICE_GET_TRAFFIC_CAMERAS = "get_traffic_cameras"
 SERVICE_GET_PASSENGER_VOLUME_BUS = "get_passenger_volume_bus"
 SERVICE_GET_PASSENGER_VOLUME_OD_BUS = "get_passenger_volume_od_bus"
 SERVICE_GET_PASSENGER_VOLUME_OD_TRAIN = "get_passenger_volume_od_train"
@@ -40,6 +42,8 @@ _ALL_SERVICES = [
     SERVICE_GET_TRAFFIC_FLOW,
     SERVICE_GET_GEOSPATIAL_LAYER,
     SERVICE_GET_EV_CHARGING_POINTS_BATCH,
+    SERVICE_GET_CARPARK_AVAILABILITY,
+    SERVICE_GET_TRAFFIC_CAMERAS,
     SERVICE_GET_PASSENGER_VOLUME_BUS,
     SERVICE_GET_PASSENGER_VOLUME_OD_BUS,
     SERVICE_GET_PASSENGER_VOLUME_OD_TRAIN,
@@ -91,6 +95,16 @@ def async_register_services(hass: HomeAssistant) -> None:
 
     async def get_ev_charging_points_batch(call: ServiceCall) -> ServiceResponse:
         return await _wrap("async_get_ev_charging_points_batch", call)
+
+    # Carpark Availability and Traffic Images are already polled by the shared
+    # tracker-backed coordinators, but neither their CarParkID nor CameraID is
+    # discoverable in the options flow. These on-demand actions reuse the same
+    # client methods so a user can list every ID before adding a tracker.
+    async def get_carpark_availability(call: ServiceCall) -> ServiceResponse:
+        return await _wrap("async_get_carpark_availability", call)
+
+    async def get_traffic_cameras(call: ServiceCall) -> ServiceResponse:
+        return await _wrap("async_get_traffic_images", call)
 
     async def get_passenger_volume_bus(call: ServiceCall) -> ServiceResponse:
         return await _wrap("async_get_passenger_volume_bus", call, {"date": call.data.get("date")})
@@ -144,6 +158,18 @@ def async_register_services(hass: HomeAssistant) -> None:
         DOMAIN,
         SERVICE_GET_EV_CHARGING_POINTS_BATCH,
         get_ev_charging_points_batch,
+        supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_GET_CARPARK_AVAILABILITY,
+        get_carpark_availability,
+        supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_GET_TRAFFIC_CAMERAS,
+        get_traffic_cameras,
         supports_response=SupportsResponse.ONLY,
     )
     hass.services.async_register(
