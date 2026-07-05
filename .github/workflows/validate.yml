@@ -2,7 +2,7 @@ name: Validate
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
   schedule:
     - cron: "0 0 * * 0"
@@ -22,3 +22,8 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
+          # description/topics require GitHub repo Settings changes, and
+          # brands requires a home-assistant/brands PR - none of these are
+          # needed to install this repo as a HACS custom repository, only
+          # for submission to the public HACS default store.
+          ignore: "description topics brands"
